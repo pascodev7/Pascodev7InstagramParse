@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.parse.LogInCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -21,23 +22,29 @@ public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = "LoginActivity";
 
-    private EditText etUsername;
-    private EditText etPassword;
-    private Button btnLogin;
+    // private EditText etUsername;
+    // private EditText etPassword;
+    // private Button btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if(currentUser != null){
+            goMainActivity();
+        }
+
+        final EditText usernameInput = findViewById(R.id.usernameInput);
+        final EditText passwordInput = findViewById(R.id.passwordInput);
+         Button btnLogin = findViewById(R.id.btnLogin);
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
+                String username = usernameInput.getText().toString();
+                String password = passwordInput.getText().toString();
                 login(username, password);
             }
         });
@@ -49,19 +56,17 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void done(ParseUser user, ParseException e) {
                 if(e != null){
-                    // TODO: better error handling
-                    Log.e(TAG, "Issue with Login");
+                    Log.d("LoginActivity", "Encountered error during login");
                     e.printStackTrace();
                     return;
                 }
-                // TODO: navigate to new activity if the user has signed properly
-                goMainActivity();
+                Log.d("LoginActivity", "Login successful");
             }
         });
     }
 
     private void goMainActivity() {
-        Intent i = new Intent(this, MainActivity.class);
+        Intent i = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(i);
         finish();
     }
